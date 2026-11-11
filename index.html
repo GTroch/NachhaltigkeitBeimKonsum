@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weniger ist mehr? – Kompass für nachhaltigen Konsum · WR 10</title>
+<style>
+:root{
+  --bg:#f6f4ee; --card:#fff; --ink:#1f2a2a; --muted:#5d6b6b; --line:#e2ded3;
+  --pri:#1f6f5c; --pri2:#2f8f75; --pri-l:#e3f1ec; --acc:#e0893a; --acc-l:#fdf0e3;
+  --red:#c2493d; --red-l:#fbe9e6; --blue:#2f6690; --blue-l:#e5eef6; --yel:#d9a521; --yel-l:#fbf4dc;
+  --pur:#6b5b9a; --pur-l:#eeebf6;
+  --r:14px; --sh:0 2px 10px rgba(30,40,40,.07);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;font-size:17px}
+header.top{background:linear-gradient(135deg,#1f6f5c,#2b8a72 60%,#3a9c7d);color:#fff;padding:28px 20px 22px}
+header.top .wrap{max-width:1080px;margin:0 auto}
+header.top small{opacity:.85;letter-spacing:.04em;text-transform:uppercase;font-size:13px}
+header.top h1{margin:6px 0;font-size:clamp(26px,4vw,38px);line-height:1.15}
+header.top p{margin:0;max-width:780px;opacity:.95}
+.progress{margin-top:14px;background:rgba(255,255,255,.25);border-radius:99px;height:10px;max-width:420px;overflow:hidden}
+.progress span{display:block;height:100%;width:0;background:#ffd38f;transition:width .4s}
+#progtxt{font-size:13px;opacity:.9;margin-top:4px}
+nav.stations{position:sticky;top:0;z-index:20;background:#fffdf8;border-bottom:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+nav.stations .wrap{max-width:1080px;margin:0 auto;display:flex;gap:6px;overflow-x:auto;padding:8px 12px}
+nav.stations button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 13px;font:inherit;font-size:14px;cursor:pointer;color:var(--ink);white-space:nowrap}
+nav.stations button.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+nav.stations button.done::after{content:" ✓";color:var(--pri2);font-weight:700}
+nav.stations button.active.done::after{color:#ffd38f}
+main{max-width:1080px;margin:0 auto;padding:22px 16px 60px}
+section.station{display:none;animation:fade .35s}
+section.station.show{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h2{font-size:clamp(23px,3vw,30px);margin:4px 0 6px;color:var(--pri)}
+h3{font-size:20px;margin:24px 0 8px}
+.lead{font-size:18px;color:var(--muted);margin-top:0}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:18px 20px;margin:14px 0;border:1px solid #efece4}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:99px;background:var(--pri-l);color:var(--pri)}
+.tag.acc{background:var(--acc-l);color:#a65a17}
+.tag.blue{background:var(--blue-l);color:var(--blue)}
+.tag.pur{background:var(--pur-l);color:var(--pur)}
+.tag.red{background:var(--red-l);color:var(--red)}
+.study{border-left:5px solid var(--pri);background:var(--pri-l);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0}
+.study b.src,.info b.src,.vwl b.src{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.study b.src{color:var(--pri)}
+.info{border-left:5px solid var(--blue);background:var(--blue-l);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0}
+.info b.src{color:var(--blue)}
+.vwl{border-left:5px solid var(--pur);background:var(--pur-l);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0}
+.vwl b.src{color:var(--pur)}
+.task{border:2px dashed var(--acc);background:var(--acc-l);border-radius:12px;padding:12px 16px;margin:14px 0}
+.task::before{content:"✏️ Auftrag";display:block;font-weight:700;color:#a65a17;font-size:14px;margin-bottom:4px}
+.btn{display:inline-block;border:none;background:var(--pri);color:#fff;padding:10px 18px;border-radius:10px;font:inherit;font-size:16px;cursor:pointer;margin:4px 6px 4px 0}
+.btn:hover{background:var(--pri2)}
+.btn.sec{background:#fff;color:var(--pri);border:2px solid var(--pri)}
+.btn.small{padding:6px 12px;font-size:14px}
+.choice{display:block;width:100%;text-align:left;border:2px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;margin:6px 0;font:inherit;cursor:pointer;transition:.15s;color:var(--ink)}
+.choice:hover{border-color:var(--pri2)}
+.choice.sel{border-color:var(--pri);background:var(--pri-l)}
+.choice.right{border-color:var(--pri);background:var(--pri-l)}
+.choice.wrong{border-color:var(--red);background:var(--red-l)}
+.fb{margin-top:8px;padding:10px 14px;border-radius:10px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--pri-l);border:1px solid #bfe0d4}
+.fb.no{background:var(--red-l);border:1px solid #efc6bf}
+.fb.neu{background:var(--yel-l);border:1px solid #efdca0}
+.sortitem{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin:8px 0;background:#fff}
+.sortitem .txt{flex:1 1 260px;font-weight:600}
+.sortitem .opts{display:flex;flex-wrap:wrap;gap:6px}
+.sortitem .opts button{border:2px solid var(--line);background:#fafaf7;border-radius:8px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer}
+.sortitem .opts button.right{background:var(--pri);border-color:var(--pri);color:#fff}
+.sortitem .opts button.wrong{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.sortitem .ex{flex-basis:100%;font-size:15px;color:var(--muted);display:none}
+.sortitem.answered .ex{display:block}
+.score{font-weight:700;color:var(--pri)}
+.bars{margin:10px 0}
+.bar{display:grid;grid-template-columns:170px 1fr 70px;align-items:center;gap:10px;margin:7px 0;font-size:15px}
+.bar .track{background:#eeebe2;border-radius:6px;height:24px;overflow:hidden}
+.bar .fill{height:100%;border-radius:6px;width:0;transition:width 1s ease}
+.bar .val{font-weight:700;text-align:right}
+@media (max-width:560px){.bar{grid-template-columns:110px 1fr 56px;font-size:13px}}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:14px 0}
+.phases div{border-radius:12px;padding:14px;color:#fff}
+.phases b{display:block;font-size:13px;opacity:.85;text-transform:uppercase;letter-spacing:.05em}
+.flip{cursor:pointer;perspective:900px;min-height:180px}
+.flip .inner{position:relative;width:100%;height:100%;min-height:180px;transition:transform .5s;transform-style:preserve-3d}
+.flip.on .inner{transform:rotateY(180deg)}
+.flip .f,.flip .b{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;padding:14px;display:flex;flex-direction:column;justify-content:center}
+.flip .f{background:#fff;border:2px solid var(--pri-l);box-shadow:var(--sh)}
+.flip .f .ic{font-size:30px}
+.flip .f small{color:var(--muted)}
+.flip .b{background:var(--pri);color:#fff;transform:rotateY(180deg);font-size:15px}
+input[type=range]{width:100%;accent-color:var(--pri)}
+.big{font-size:28px;font-weight:800;color:var(--pri)}
+.kpi{display:flex;gap:14px;flex-wrap:wrap}
+.kpi div{flex:1 1 150px;background:#faf9f5;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kpi b{display:block;font-size:22px}
+label.f{display:block;font-weight:700;margin-top:10px}
+label.f small{font-weight:400;color:var(--muted)}
+input[type=text],input[type=number],textarea,select{width:100%;padding:9px 11px;border:2px solid var(--line);border-radius:9px;font:inherit;background:#fff}
+textarea{min-height:90px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pri2)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+table.track{border-collapse:collapse;width:100%;font-size:15px}
+table.track th,table.track td{border:1px solid var(--line);padding:6px;text-align:center}
+table.track th{background:var(--pri-l)}
+table.track td:first-child{text-align:left}
+.amp{display:inline-block;width:16px;height:16px;border-radius:50%;vertical-align:middle}
+.meter{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:14px}
+.meter span{background:#f2efe7;border-radius:8px;padding:4px 9px}
+details{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0}
+details summary{cursor:pointer;font-weight:700}
+footer{max-width:1080px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);font-size:14px}
+footer a{color:var(--pri)}
+.nextnav{display:flex;justify-content:space-between;margin-top:26px;gap:10px;flex-wrap:wrap}
+.result-ring{font-size:46px;font-weight:800;color:var(--pri)}
+/* Wizard / Entscheidungsbaum */
+.wiz{background:#fff;border:2px solid var(--pri-l);border-radius:14px;padding:18px 20px;margin:12px 0}
+.wiz .path{font-size:13px;color:var(--muted);margin-bottom:8px}
+.wiz .q{font-size:19px;font-weight:700;margin-bottom:6px}
+.wiz .hint{font-size:15px;color:var(--muted);margin-bottom:6px}
+.wiz .end{border-radius:12px;padding:14px 16px;font-size:17px}
+.wiz .end.stop{background:var(--red-l);border:2px solid #efc6bf}
+.wiz .end.go{background:var(--pri-l);border:2px solid #bfe0d4}
+.wiz .end.mid{background:var(--yel-l);border:2px solid #efdca0}
+.stopsign{display:inline-block;background:var(--red);color:#fff;font-weight:800;border-radius:6px;padding:2px 8px;margin-right:6px;font-size:14px}
+.chip{display:inline-block;border:2px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;margin:4px;cursor:pointer;font-size:15px;user-select:none}
+.chip.sel{border-color:var(--pri);background:var(--pri-l)}
+.itemcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0;background:#fff}
+.itemcard .crit{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.letter{background:#fffdf5;border:1px solid #e9dfc2;border-radius:12px;padding:20px 24px;font-family:Georgia,"Times New Roman",serif;white-space:pre-wrap;display:none;margin-top:12px}
+@media print{
+  nav.stations,header.top .progress,.nextnav,.btn,#progtxt,footer{display:none!important}
+  section.station{display:none!important}
+  section.station.show{display:block!important}
+  body{background:#fff;font-size:13px}
+  .card{box-shadow:none;border:1px solid #ccc}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <small>Wirtschaft und Recht · Jahrgangsstufe 10 · Lernbereich 1</small>
+    <h1>Weniger ist mehr? – Dein Kompass für nachhaltigen Konsum</h1>
+    <p>Warum kaufen wir so viel, was macht das mit uns und mit der Umwelt – und wie schafft man es, mit weniger glücklich zu sein? Eine Reise durch deine eigene Konsumwelt in 10 Stationen.</p>
+    <div class="progress"><span id="progbar"></span></div>
+    <div id="progtxt">0 von 10 Stationen erledigt</div>
+  </div>
+</header>
+
+<nav class="stations"><div class="wrap" id="navwrap"></div></nav>
+
+<main>
+
+<!-- ========== S0 KONSUM-CHECK ========== -->
+<section class="station" id="s0" data-title="1 · Mein Konsum-Check">
+  <span class="tag acc">Station 1 · Einstieg</span>
+  <h2>Mein Konsum-Check</h2>
+  <p class="lead">Bevor es losgeht: Wie konsumierst du? Antworte ehrlich – das Ergebnis siehst nur du.</p>
+  <div id="checkQs"></div>
+  <button class="btn" onclick="evalCheck()">Auswerten</button>
+  <div class="card" id="checkRes" style="display:none"></div>
+</section>
+
+<!-- ========== S1 ÜBERFLUSS IN ZAHLEN ========== -->
+<section class="station" id="s1" data-title="2 · Überfluss in Zahlen">
+  <span class="tag">Station 2</span>
+  <h2>Leben im Überfluss – schätz mal!</h2>
+  <p class="lead">Wir leben in einer Konsumgesellschaft: Ein Überfluss an Dingen ist für uns normal. Wir kaufen, was wir nicht brauchen, besitzen, was wir nicht nutzen, und werfen weg, was noch funktioniert. Wie viel ist das konkret? Schätze zuerst, dann lös auf.</p>
+  <div id="guesses"></div>
+  <div class="info"><b class="src">Zum Vergleich: Dein CO₂-Fußabdruck (Umweltbundesamt 2026)</b>
+    Von durchschnittlich 9,8 Tonnen CO₂ pro Person und Jahr entfallen 2,5 Tonnen (26 %) auf <b>„sonstigen Konsum“</b> – also Kleidung, Elektronik, Möbel, Freizeitartikel. Das ist der <b>größte einzelne Posten</b>, noch vor Mobilität (2,1 t), Wohnen (1,9 t) und Ernährung (1,6 t). Weniger Dinge zu kaufen, ist also kein Nebenschauplatz.
+  </div>
+</section>
+
+<!-- ========== S2 WARUM SO VIEL ========== -->
+<section class="station" id="s2" data-title="3 · Warum kaufen wir so viel?">
+  <span class="tag">Station 3</span>
+  <h2>Warum kaufen wir so viel – und was macht das mit uns?</h2>
+  <div class="grid g4">
+    <div class="card">🛒 <b>Angebot überall</b><br><small>Online rund um die Uhr, riesige Sortimente</small></div>
+    <div class="card">⚡ <b>Schnelle Trends</b><br><small>Mode wechselt ständig</small></div>
+    <div class="card">🏷️ <b>Niedrige Preise</b><br><small>Vieles ist billig zu haben</small></div>
+    <div class="card">📣 <b>Werbung</b><br><small>rund 48 Mrd. € in Deutschland (2022)</small></div>
+  </div>
+  <div class="study"><b class="src">Aus dem Ratgeber</b>
+    Kaufen ist mehr als Versorgung: Shoppen ist zur <b>Freizeitbeschäftigung</b> geworden, und Dinge haben <b>symbolische Funktionen</b> – Werbung und Gesellschaft schreiben ihnen Wirkungen zu (die Jeans macht angeblich cool, das Auto erfolgreich).<br>
+    • <b>Nach innen</b> gerichtet: Belohnung, Lust, besseres Selbstwertgefühl, Ausgleich für gefühlte Mängel.<br>
+    • <b>Nach außen</b> gerichtet: Status zeigen, Zugehörigkeit zu einer Gruppe – oder Abgrenzung von anderen.
+  </div>
+  <h3>Übung: Nach innen oder nach außen?</h3>
+  <div id="sortSym"></div>
+  <p class="score" id="sortSymScore"></p>
+
+  <h3>Die Folgen – klick auf die Karten</h3>
+  <div class="grid g3" id="folgenCards"></div>
+
+  <div class="card">
+    <span class="tag">Ergebnis aus dem Forschungsprojekt</span>
+    <div class="kpi" style="margin-top:10px">
+      <div><b>47 %</b>der Befragten sind <b>soziale Beziehungen und Erlebnisse</b> besonders wichtig</div>
+      <div><b>9 %</b>halten <b>materielle Besitztümer</b> für besonders wichtig</div>
+    </div>
+    <p style="margin-bottom:0">Trotzdem kaufen die meisten von uns ständig neue Dinge. Wie passt das zusammen?</p>
+  </div>
+  <div class="task">Nimm dein zuletzt gekauftes Teil (kein Lebensmittel): Welche Funktion hatte der Kauf wirklich – Gebrauch, Belohnung, Status, Zugehörigkeit? Notiere ehrlich.</div>
+</section>
+
+<!-- ========== S3 WENIGER IST MEHR ========== -->
+<section class="station" id="s3" data-title="4 · Weniger ist mehr">
+  <span class="tag">Station 4</span>
+  <h2>Weniger ist mehr: Sein statt Haben</h2>
+  <p class="lead">Gegen den Überfluss gibt es Gegenbewegungen – vom „einfachen Leben“ bis zum Minimalismus, den Serien und Influencer bekannt gemacht haben.</p>
+  <div class="grid g2">
+    <div class="card"><span class="tag">Minimalismus</span><p>Mit wenig Besitz auskommen, bewusst und reduziert konsumieren, das eigene Glück weniger von Dingen abhängig machen. Versprechen: Weniger Besitz = mehr Sinn und Glück.</p></div>
+    <div class="card"><span class="tag acc">Suffizienz</span><p>Eine Nachhaltigkeitsstrategie: Den Ressourcenverbrauch senken, indem man <b>weniger</b> Güter und Dienstleistungen nachfragt – Motto: „Genug ist genug.“</p></div>
+  </div>
+  <div class="study"><b class="src">Was die Forschung zeigt</b>
+    Menschen, die freiwillig einfach leben, berichten häufiger von <b>mehr Lebenszufriedenheit</b>, Achtsamkeit, Unabhängigkeit, besseren Beziehungen sowie <b>weniger Stress und Ängsten</b>. Umgekehrt sind stark materialistisch eingestellte Menschen im Schnitt weniger zufrieden. Und für die Umwelt gilt: <b>Je länger wir Produkte nutzen und je weniger wir neu kaufen, desto weniger Ressourcen und Abfall.</b>
+  </div>
+
+  <h3>Weniger besitzen heißt nicht verzichten: Sharing</h3>
+  <div class="grid g4">
+    <div class="card">🚗 <b>Carsharing</b><br><small>Auto nur dann, wenn man es braucht</small></div>
+    <div class="card">⛺ <b>Leihplattformen</b><br><small>Zelt, Bohrmaschine, Beamer</small></div>
+    <div class="card">👗 <b>Mieten</b><br><small>Outfit für Abiball oder Hochzeit</small></div>
+    <div class="card">🧇 <b>Nachbarschaft</b><br><small>Waffeleisen, Extra-Stühle – plus netter Kontakt</small></div>
+  </div>
+
+  <h3>Exkurs: Erich Fromm – „Haben oder Sein“</h3>
+  <div class="grid g2">
+    <div class="card" style="border-top:5px solid var(--red)"><b>Existenzweise des Habens</b><p style="margin-bottom:0">Erwerben, besitzen, Gewinn machen bestimmen das Denken. Identität wird über Eigentum definiert; Besitz wird nicht geteilt und seine Herkunft nicht hinterfragt. Laut Fromm verschärft das wirtschaftliche, soziale und ökologische Krisen.</p></div>
+    <div class="card" style="border-top:5px solid var(--pri)"><b>Existenzweise des Seins</b><p style="margin-bottom:0">Wohlbefinden entsteht aus eigenen Talenten, Erlebnissen, kritischem Denken und Handeln nach eigenen Werten. Geben, Teilen und Solidarität stehen im Mittelpunkt – ebenso Nachhaltigkeit und vernünftiger Konsum.</p></div>
+  </div>
+  <h3>Übung: Haben oder Sein?</h3>
+  <div id="sortFromm"></div>
+  <p class="score" id="sortFrommScore"></p>
+</section>
+
+<!-- ========== S4 KONSUMFALLEN ========== -->
+<section class="station" id="s4" data-title="5 · Die Konsumfallen">
+  <span class="tag red">Station 5 · Achtung!</span>
+  <h2>Die Schattenseite: Wenn Minimalismus zur Konsumfalle wird</h2>
+  <p class="lead">Ausmisten liegt im Trend. Aber: Bei vielen füllt sich der freie Platz schnell wieder. Die Forschenden haben drei typische Fallen gefunden.</p>
+  <div class="grid g3">
+    <div class="card"><span class="tag red">Falle 1</span><h3 style="margin-top:8px">Die Ästhetik-Falle</h3><p>Der „minimalistische Look“ (klare Linien, gedeckte Farben, ausgewählte Pflanzen) oder die perfekte <b>Kapselgarderobe</b> lässt sich selten mit vorhandenen Dingen erreichen – Shops und Influencer verkaufen die „Must-haves“ gleich mit.</p></div>
+    <div class="card"><span class="tag red">Falle 2</span><h3 style="margin-top:8px">Moralische Lizenzierung</h3><p>„Ich habe ausgemistet und gespendet – jetzt darf ich mir was gönnen.“ Wer sich vorher „gut“ verhalten hat, rechtfertigt damit den nächsten Kauf. Regeln wie <b>„Ein Ding rein – ein Ding raus“</b> verstärken das. Ergebnis: immer schnellere Kreisläufe aus Ausmisten und Neukaufen.</p></div>
+    <div class="card"><span class="tag red">Falle 3</span><h3 style="margin-top:8px">Der Rebound-Effekt</h3><p>Wer weniger Dinge kauft, spart Geld und Zeit. Fließt das gesparte Geld in umweltschädliche Aktivitäten (z. B. eine Flugreise), kann die Umweltbilanz am Ende schlechter sein als vorher.</p></div>
+  </div>
+  <div class="vwl"><b class="src">Verbindung zur Verhaltensökonomie</b>Moralische Lizenzierung ist – wie Ankereffekt oder Framing – ein Beispiel dafür, dass wir nicht wie der rationale „Homo oeconomicus“ entscheiden.</div>
+
+  <h3>Übung: Welche Falle ist das?</h3>
+  <div id="sortFalle"></div>
+  <p class="score" id="sortFalleScore"></p>
+
+  <h3>Rebound-Rechner: Wohin fließt dein gespartes Geld?</h3>
+  <div class="card">
+    <p>Du kaufst ab jetzt weniger Klamotten und Gadgets und sparst dadurch jeden Monat:</p>
+    <label class="f">Ersparnis pro Monat: <span id="rbV">30 €</span></label>
+    <input type="range" min="5" max="100" step="5" value="30" id="rbSl" oninput="calcRebound()">
+    <div class="kpi" style="margin-top:10px"><div>nach 1 Jahr<b id="rbY">360 €</b></div><div>nach 3 Jahren<b id="rb3">1.080 €</b></div></div>
+    <p style="margin-top:14px"><b>Was machst du mit dem Geld?</b></p>
+    <div id="rbChoices"></div>
+    <div class="fb" id="rbFb"></div>
+  </div>
+</section>
+
+<!-- ========== S5 PHASE 1 INTROSPEKTION ========== -->
+<section class="station" id="s5" data-title="6 · Phase 1: Hinschauen">
+  <div class="phases">
+    <div style="background:#2f6690"><b>Phase 1</b>Introspektion – hinschauen</div>
+    <div style="background:#9aa3a3"><b>Phase 2</b>Reduktion – ausmisten</div>
+    <div style="background:#9aa3a3"><b>Phase 3</b>Weitergabe – neuer Zweck</div>
+    <div style="background:#9aa3a3"><b>Phase 4</b>Dranbleiben – widerstehen</div>
+  </div>
+  <span class="tag blue">Station 6 · Phase 1</span>
+  <h2>Introspektion: Was besitzt du – und was bedeutet es dir?</h2>
+  <p class="lead">Der Ratgeber schlägt vier Phasen vor. In der ersten geht es nicht ums Wegwerfen, sondern ums Hinschauen. Es gibt kein Richtig oder Falsch.</p>
+
+  <h3>Übung 1: Was willst du wirklich im Leben?</h3>
+  <div class="card">
+    <div class="row2">
+      <div><label class="f">Davon wünsche ich mir MEHR <small>(materiell oder immateriell)</small></label><textarea id="more" placeholder="z. B. Zeit mit Freunden, Urlaub am Meer, ein gutes Fahrrad …"></textarea></div>
+      <div><label class="f">Davon wünsche ich mir WENIGER</label><textarea id="less" placeholder="z. B. Unordnung im Zimmer, Bildschirmzeit, Stress …"></textarea></div>
+    </div>
+    <button class="btn small" onclick="analyseWishes()">Auswerten</button>
+    <div class="fb neu" id="wishFb"></div>
+  </div>
+
+  <h3>Übung 2: Was ist dein Ding?</h3>
+  <div class="card">
+    <div class="row2">
+      <div><label class="f">Bereich</label><select id="ldBer"></select></div>
+      <div><label class="f">Mein Lieblingsding</label><input type="text" id="ldDing" placeholder="z. B. meine alte Gitarre"></div>
+    </div>
+    <label class="f">… ist mir wichtig, weil</label><input type="text" id="ldWeil">
+    <p style="font-size:15px;color:var(--muted)">Viele merken dabei: Zu ihren Lieblingsdingen haben sie eine <b>emotionale Verbindung</b> – selten ist es das Neueste oder Teuerste.</p>
+  </div>
+
+  <h3>Übung 3: Wie viele Dinge hast du tatsächlich?</h3>
+  <div class="card">
+    <p>Die meisten unterschätzen, wie viel sie besitzen. Wähle einen Bereich (z. B. Kleidung), zähle zu Hause in jeder Kategorie und trage ein, was du <b>seit mindestens 12 Monaten nicht genutzt</b> hast.</p>
+    <table class="track" id="countTbl"><tr><th>Kategorie</th><th>Anzahl</th><th>davon ungenutzt</th></tr></table>
+    <button class="btn small sec" onclick="addCountRow()">+ Zeile</button>
+    <button class="btn small" onclick="calcCount()">Auswerten</button>
+    <div class="fb neu" id="countFb"></div>
+  </div>
+
+  <h3>Die Reise deiner Dinge</h3>
+  <div class="card">
+    <p>Nimm einen Gegenstand in die Hand (z. B. dein Handy, deine Lieblingsschuhe) und überlege:</p>
+    <ul><li>Aus welchen Materialien besteht er – und woher kommen sie?</li><li>Wer war alles an der Herstellung beteiligt? Durch wie viele Hände ging er?</li><li>Wie viel Wasser, Energie und Rohstoffe stecken wohl darin?</li></ul>
+    <p style="margin-bottom:0">Es geht nicht um die exakt richtige Antwort. Aber: <b>Egal wie billig ein Produkt war – es steckt viel Arbeit und Material darin.</b> Wer das erkennt, kauft bewusster.</p>
+  </div>
+
+  <h3>Exkurs: Achtsamkeit – den „Konsum-Autopiloten“ ausschalten</h3>
+  <div class="grid g2">
+    <div class="card">🧠 <b>Autopilot aus</b><br>Viel Konsum läuft über Routinen: schnell in der App bestellen, Süßes an der Kasse mitnehmen. Achtsamkeit hilft, solche Gewohnheiten zu bemerken.</div>
+    <div class="card">🪞 <b>Sein, wie man sein will</b><br>Wer unbewusst kauft, kauft manchmal Dinge, die er eigentlich nicht gut findet – das erzeugt Stress.</div>
+    <div class="card">🎨 <b>Immaterielle Werte</b><br>Achtsamkeit bringt uns Erlebnissen, Beziehungen, Kultur und Kreativität näher.</div>
+    <div class="card">🌍 <b>Freundlich zu Menschen und Planet</b><br>Achtsame Menschen sind oft offener und großzügiger – und verhalten sich häufig auch umweltschonender.</div>
+  </div>
+  <div class="info"><b class="src">Resonanz (Hartmut Rosa)</b>Uns geht es gut, wenn wir mit Menschen und Dingen „auf einer Wellenlänge“ sind. Das braucht Zeit. Je mehr Dinge wir besitzen, desto weniger Aufmerksamkeit bleibt für jedes einzelne – und desto weniger genießen wir es.</div>
+  <button class="btn" onclick="markDone(5);go(6)">Phase 1 abgeschlossen → weiter</button>
+</section>
+
+<!-- ========== S6 PHASE 2 REDUKTION ========== -->
+<section class="station" id="s6" data-title="7 · Phase 2: Ausmisten">
+  <div class="phases">
+    <div style="background:#9aa3a3"><b>Phase 1</b>Introspektion – hinschauen</div>
+    <div style="background:#1f6f5c"><b>Phase 2</b>Reduktion – ausmisten</div>
+    <div style="background:#9aa3a3"><b>Phase 3</b>Weitergabe – neuer Zweck</div>
+    <div style="background:#9aa3a3"><b>Phase 4</b>Dranbleiben – widerstehen</div>
+  </div>
+  <span class="tag">Station 7 · Phase 2</span>
+  <h2>Reduktion: Achtsam ausmisten</h2>
+  <p class="lead">Achtsam ausmisten heißt: bewusst entscheiden, was bleibt – je nachdem, was dir wichtig ist. Je klarer du weißt, <i>warum</i> du dich von etwas trennst, desto eher widerstehst du beim nächsten Kauf.</p>
+
+  <h3>Warum tut Trennen weh?</h3>
+  <div class="grid g3">
+    <div class="card">📸 <b>Erinnerungen</b><br>Dinge speichern unsere Geschichte. Etwas wegzugeben kann sich anfühlen wie ein Verlust.</div>
+    <div class="card">🧍 <b>Das „erweiterte Selbst“</b><br>Besitz wird Teil unserer Identität – „das bin ich“.</div>
+    <div class="card">💎 <b>Besitztumseffekt (Endowment-Effekt)</b><br>Was uns gehört, bewerten wir höher als ein gleiches Ding, das uns nicht gehört.</div>
+  </div>
+  <div class="vwl"><b class="src">Verbindung zur Verhaltensökonomie</b>Den Endowment-Effekt hat der Ökonom Richard Thaler beschrieben (Wirtschaftsnobelpreis 2017). Er hängt eng mit der <b>Verlustaversion</b> zusammen: Verluste schmerzen uns stärker, als gleich große Gewinne uns freuen.</div>
+
+  <h3>Bekannte Ausmist-Methoden</h3>
+  <div class="grid g3" id="methodCards"></div>
+  <p style="font-size:15px;color:var(--muted)">Hinweis aus dem Ratgeber: Ob diese Methoden das Konsumverhalten langfristig ändern, ist noch nicht erforscht. Entscheidend ist, dass du dir Zeit zum Nachdenken nimmst.</p>
+
+  <h3>Rechner: Das „Minimalist Game“</h3>
+  <div class="card">
+    <p>Tag 1: ein Ding geht. Tag 2: zwei Dinge. Tag 3: drei … Wie viele Dinge sind nach einer bestimmten Zahl von Tagen weg?</p>
+    <label class="f">Anzahl Tage: <span id="mgV">30</span></label>
+    <input type="range" min="1" max="30" value="30" id="mgSl" oninput="calcMG()">
+    <div class="big" id="mgOut">465 Dinge</div>
+    <small style="color:var(--muted)">Formel: n · (n + 1) / 2 – schaffst du das? Für die meisten ist die Leave-it-Methode mit etwa 3 Dingen pro Tag realistischer.</small>
+  </div>
+
+  <h3>Probier die Love-it-Methode aus</h3>
+  <p>Behalte nur, was dir wirklich am Herzen liegt: weil es <b>nützlich</b> ist, dich <b>glücklich</b> macht, <b>schöne Erinnerungen</b> weckt oder du es <b>oft brauchst</b>. Kreuze bei jedem Ding an, was zutrifft – dann entscheide.</p>
+  <div id="loveIt"></div>
+  <div class="card" id="loveSum" style="display:none"></div>
+</section>
+
+<!-- ========== S7 PHASE 3 WEITERGABE ========== -->
+<section class="station" id="s7" data-title="8 · Phase 3: Weitergeben">
+  <div class="phases">
+    <div style="background:#9aa3a3"><b>Phase 1</b>Introspektion – hinschauen</div>
+    <div style="background:#9aa3a3"><b>Phase 2</b>Reduktion – ausmisten</div>
+    <div style="background:#a65a17"><b>Phase 3</b>Weitergabe – neuer Zweck</div>
+    <div style="background:#9aa3a3"><b>Phase 4</b>Dranbleiben – widerstehen</div>
+  </div>
+  <span class="tag acc">Station 8 · Phase 3</span>
+  <h2>Weitergabe: Den Dingen einen neuen Zweck geben</h2>
+  <p class="lead">Der Weg zur Mülltonne ist der bequemste – aber nicht der nachhaltigste. Viele brauchbare Dinge landen im Abfall, weil die Alternativen weniger bekannt und aufwändiger sind.</p>
+  <div class="study"><b class="src">Kreislaufwirtschaft</b>
+    Ziel ist, weniger Neues herzustellen und weniger Abfall zu erzeugen. Produkte sollen von Anfang an langlebig sein und danach wiederverwendet, recycelt oder kompostiert werden. Du trägst dazu bei: <b>beim Kauf</b> (haltbar, reparierbar, zeitlos), <b>bei der Nutzung</b> (pflegen, reparieren) und <b>beim Loswerden</b> (Wiederverwendung statt Müll).
+  </div>
+  <div class="grid g4">
+    <div class="card">🎁 <b>Verschenken, vererben, tauschen</b><br><small>Familie, Freunde, Kleidertauschparty, Verschenk-Plattformen</small></div>
+    <div class="card">🤲 <b>Spenden</b><br><small>Wohlfahrtsverbände – vorher Seriosität prüfen; lokal ist am nachhaltigsten</small></div>
+    <div class="card">💶 <b>Verkaufen oder verleihen</b><br><small>Flohmarkt, Secondhandladen, Online-Plattformen – mehr Aufwand, dafür Geld</small></div>
+    <div class="card">🔧 <b>Reparieren, upcyceln, recyceln</b><br><small>Repair-Café, kreative Umgestaltung, richtige Entsorgung</small></div>
+  </div>
+
+  <h3>Entscheidungsbaum: Wohin mit dem Ding?</h3>
+  <p>Denk an einen konkreten Gegenstand, den du loswerden willst, und klick dich durch.</p>
+  <div class="wiz" id="wizDisp"></div>
+
+  <h3>Übung: Recycling, Upcycling, Reparatur oder Weitergabe?</h3>
+  <div id="sortWeg"></div>
+  <p class="score" id="sortWegScore"></p>
+
+  <details><summary>Spickzettel: Richtig entsorgen, wenn nichts anderes geht</summary>
+    <ul>
+      <li><b>Wertstoffhof:</b> kaputte Kleidung, Elektrogeräte, Sperrmüll, Farben, Reinigungsmittel, Energiesparlampen, Altholz, Druckbehälter – nicht in den Hausmüll.</li>
+      <li><b>Handel:</b> Große Elektrohändler müssen kleine Elektrogeräte (bis 25 cm Kantenlänge) kostenlos zurücknehmen, größere beim Kauf eines neuen Geräts.</li>
+      <li><b>Batterien und Akkus:</b> überall abgeben, wo Batterien verkauft werden (Supermarkt, Drogerie, Baumarkt).</li>
+      <li><b>Alte Handys:</b> Sammelaktionen (z. B. von Umweltverbänden) – in Schubladen liegen Millionen davon!</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ========== S8 PHASE 4 DRANBLEIBEN ========== -->
+<section class="station" id="s8" data-title="9 · Phase 4: Dranbleiben">
+  <div class="phases">
+    <div style="background:#9aa3a3"><b>Phase 1</b>Introspektion – hinschauen</div>
+    <div style="background:#9aa3a3"><b>Phase 2</b>Reduktion – ausmisten</div>
+    <div style="background:#9aa3a3"><b>Phase 3</b>Weitergabe – neuer Zweck</div>
+    <div style="background:#6b5b9a"><b>Phase 4</b>Dranbleiben – widerstehen</div>
+  </div>
+  <span class="tag pur">Station 9 · Phase 4</span>
+  <h2>Dranbleiben: Die Kunst zu widerstehen</h2>
+  <p class="lead">Ausmisten ist der Anfang. Nachhaltig wird es erst, wenn du danach dauerhaft weniger kaufst. Dabei stehen dir zwei Gegner im Weg: Gewohnheiten und Kaufreize.</p>
+  <div class="grid g2">
+    <div class="card"><span class="tag pur">Die Macht der Gewohnheit</span><p>Ein Reiz (Werbung, Langeweile, Stress) löst ein Verhalten aus (Shopping-App öffnen), das sofort belohnt wird (kurzes Glücksgefühl). Nach vielen Wiederholungen läuft das automatisch ab – ohne bewusste Entscheidung.</p></div>
+    <div class="card"><span class="tag pur">Selbstkontrolle ist wie ein Muskel</span><p>Sie kann ermüden (nach einem anstrengenden Tag), lässt sich aber trainieren. Sie scheitert oft an widersprüchlichen Zielen („mir was gönnen“ vs. „sparen“) und daran, dass wir unsere Käufe nicht nachverfolgen.</p></div>
+  </div>
+
+  <h3>Entscheidungsbaum gegen Spontankäufe</h3>
+  <p>Denk an etwas, das du gerade gern kaufen würdest (kein Essen), und klick dich durch.</p>
+  <div class="wiz" id="wizKauf"></div>
+
+  <h3>Meine Kauf-Auslöser</h3>
+  <p>Wer seine Auslöser kennt, kann sich vorbereiten. Was verleitet <b>dich</b> zu Spontankäufen? (Mehrfachauswahl)</p>
+  <div id="trigChips"></div>
+  <div class="fb neu" id="trigFb"></div>
+
+  <h3>5 Trainingstipps für den Selbstkontroll-Muskel</h3>
+  <div class="grid g3" id="tipCards"></div>
+
+  <h3>Wie lange dauert es, bis etwas zur Gewohnheit wird?</h3>
+  <div class="card">
+    <input type="range" min="7" max="120" value="21" id="habSl" oninput="document.getElementById('habV').textContent=this.value+' Tage'">
+    <div class="big" id="habV">21 Tage</div>
+    <button class="btn small" onclick="revealHab()">Auflösen</button>
+    <div class="fb ok" id="habFb"></div>
+  </div>
+  <div class="grid g3">
+    <div class="card"><b>1. Starten</b><br>Ziel wählen, ein einfaches Verhalten dafür festlegen, genau planen: wann und wo.</div>
+    <div class="card"><b>2. Lernen</b><br>Das Verhalten immer im gleichen Zusammenhang (Ort, Uhrzeit) wiederholen.</div>
+    <div class="card"><b>3. Festigen</b><br>Mit der Zeit läuft es automatisch – ohne Nachdenken.</div>
+  </div>
+  <div class="info"><b class="src">Zusammen ist es leichter</b>Menschen orientieren sich am Verhalten anderer. Erzähl Familie und Freunden von deinem Vorhaben, such dir Vorbilder und schau nach Gruppen in deiner Nähe (Tauschring, Repair-Café, Umweltinitiative, Schul-AG).</div>
+</section>
+
+<!-- ========== S9 LABOR + PLAN + QUIZ ========== -->
+<section class="station" id="s9" data-title="10 · Labor, Challenge & Quiz">
+  <span class="tag acc">Station 10 · Anwendung &amp; Abschluss</span>
+  <h2>Entscheidungslabor, deine Challenge &amp; Abschlussquiz</h2>
+
+  <h3>A. Entscheidungslabor: Was würdest du tun?</h3>
+  <p>Sechs Situationen aus dem Alltag. Vergleiche die Optionen – es gibt nicht immer nur eine richtige Lösung.</p>
+  <div id="scen"></div>
+  <div class="card" id="scenSum" style="display:none"></div>
+
+  <h3>B. Meine Challenge</h3>
+  <p>Der Ratgeber schlägt drei Herausforderungen vor. Wähle eine aus (Schulversion: 4 Wochen statt der im Ratgeber empfohlenen 8 Wochen).</p>
+  <div id="chalPick"></div>
+  <div class="card" id="chalBox" style="display:none">
+    <div id="chalForm"></div>
+    <div id="tracker" style="margin-top:12px"></div>
+  </div>
+
+  <h3>C. Brief an mein zukünftiges Ich</h3>
+  <div class="card">
+    <p>Halte fest, was du mitnimmst. Öffne den Brief (ausgedruckt oder als PDF) in drei Monaten wieder.</p>
+    <label class="f">Was hat mich an diesem Thema überrascht?</label><textarea id="b1"></textarea>
+    <label class="f">Was habe ich über meine Beziehung zu meinen Dingen gelernt?</label><textarea id="b2"></textarea>
+    <label class="f">Was nehme ich mir für meinen Konsum vor?</label><textarea id="b3"></textarea>
+    <label class="f">Wie spreche ich mit anderen darüber, ohne zu nerven? <small>(Tipp: kein Vortrag, sondern Gespräch; erst zuhören; von eigenen Erfahrungen erzählen; Verhalten sprechen lassen)</small></label><textarea id="b4"></textarea>
+    <button class="btn" onclick="makeLetter()">Brief erstellen</button>
+    <button class="btn sec" onclick="window.print()">🖨️ Drucken / als PDF speichern</button>
+    <div class="letter" id="letter"></div>
+  </div>
+
+  <h3>D. Abschlussquiz</h3>
+  <div id="quiz"></div>
+  <button class="btn" onclick="evalQuiz()">Quiz auswerten</button>
+  <div class="card" id="quizRes" style="display:none"></div>
+</section>
+
+<div class="nextnav">
+  <button class="btn sec" id="prevBtn" onclick="go(cur-1)">← Zurück</button>
+  <button class="btn" id="nextBtn" onclick="go(cur+1)">Weiter →</button>
+</div>
+</main>
+
+<footer>
+  <details>
+    <summary>Quellen</summary>
+    <p><b>Grundlage:</b> Münsch, M., Wloch, M., Walsleben, L. S., Iran, S., Muster, V. &amp; Beppler, J. (2024): <i>Kompass Konsumreduktion. Der Ratgeber zur Befreiung vom Überfluss.</i> oekom. – Ergebnis des Citizen-Science-Forschungsprojekts „MeinDing! – Ich bin, was ich (nicht) habe“ (gefördert vom BMBF, 2021–2024). Die Inhalte wurden für Jahrgangsstufe 10 zusammengefasst und in eigenen Worten wiedergegeben; die Zahlen in Station 2 stammen aus dem Ratgeber (dort mit Quellen von Greenpeace, Statista, Destatis, ZAW).</p>
+    <p><b>Ergänzung</b> (abgerufen am 11.11.2026): Umweltbundesamt, Durchschnittlicher CO₂-Fußabdruck pro Kopf in Deutschland, Stand 25.03.2026 – <a href="https://www.umweltbundesamt.de/n307571de" target="_blank">uba.de/n307571de</a></p>
+  </details>
+  <details>
+    <summary>Hinweise für die Lehrkraft</summary>
+    <p><b>Lehrplanbezug:</b> LehrplanPLUS Gymnasium Bayern, WR 10, Lernbereich 1 „Ökonomisches Handeln auf dem Markt“ – Prinzip der Nachhaltigkeit bei Verbraucherentscheidungen; Querbezüge zu verhaltensökonomischen Effekten (Endowment-Effekt, Verlustaversion, moralische Lizenzierung, Selbstkontrolle) und zum Einfluss von Werbung.</p>
+    <p><b>Zeitbedarf:</b> ca. 2 × 45 Minuten (Stationen 1–5 / 6–10) plus Challenge als Langzeitaufgabe über 4 Wochen. Die Zählübung in Station 6 und die Love-it-Methode eignen sich als Hausaufgabe.</p>
+    <p><b>Technik und Datenschutz:</b> Die Seite läuft offline in jedem aktuellen Browser. Eingaben bleiben – soweit der Browser es zulässt – nur lokal auf dem Gerät; es werden keine Daten übertragen.</p>
+  </details>
+</footer>
+
+<script>
+/* ===== Speicher (nur lokal) ===== */
+const KEY="wr10_konsumreduktion_v1";
+let S={done:{},check:null,chal:null,chalData:{},track:{}};
+try{const s=localStorage.getItem(KEY);if(s)S=Object.assign(S,JSON.parse(s));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const $=id=>document.getElementById(id);
+const fmt=n=>n.toLocaleString("de-DE");
+
+/* ===== Navigation ===== */
+const secs=[...document.querySelectorAll("section.station")];let cur=0;
+const nav=$("navwrap");
+secs.forEach((s,i)=>{const b=document.createElement("button");b.textContent=s.dataset.title;b.onclick=()=>go(i);nav.appendChild(b);});
+function go(i){if(i<0||i>=secs.length)return;cur=i;
+ secs.forEach((s,k)=>s.classList.toggle("show",k===i));
+ [...nav.children].forEach((b,k)=>b.classList.toggle("active",k===i));
+ nav.children[i].scrollIntoView({inline:"center",block:"nearest"});
+ $("prevBtn").style.visibility=i===0?"hidden":"visible";
+ $("nextBtn").style.visibility=i===secs.length-1?"hidden":"visible";
+ window.scrollTo({top:document.querySelector("nav.stations").offsetTop,behavior:"smooth"});}
+function markDone(i){S.done[i]=true;save();updProg();}
+function updProg(){const n=Object.keys(S.done).length;$("progbar").style.width=(n/secs.length*100)+"%";
+ $("progtxt").textContent=n+" von "+secs.length+" Stationen erledigt";
+ [...nav.children].forEach((b,k)=>b.classList.toggle("done",!!S.done[k]));}
+
+/* ===== Sortierspiel ===== */
+function sortGame(elId,scoreId,opts,items,station){
+ const el=$(elId);let right=0,answered=0;
+ items.forEach(it=>{const d=document.createElement("div");d.className="sortitem";
+  d.innerHTML=`<div class="txt">${it.t}</div><div class="opts"></div><div class="ex">${it.e||""}</div>`;
+  const o=d.querySelector(".opts");
+  opts.forEach((op,k)=>{const b=document.createElement("button");b.textContent=op;
+   b.onclick=()=>{if(d.classList.contains("answered"))return;d.classList.add("answered");answered++;
+    if(k===it.a){b.classList.add("right");right++;}else{b.classList.add("wrong");o.children[it.a].classList.add("right");}
+    $(scoreId).textContent=`${right} von ${answered} richtig`+(answered===items.length?" – fertig!":"");
+    if(answered===items.length&&station!==undefined)markDone(station);};
+   o.appendChild(b);});
+  el.appendChild(d);});
+}
+function flipCards(elId,arr){const c=$(elId);arr.forEach(a=>{const d=document.createElement("div");d.className="flip";
+ d.innerHTML=`<div class="inner"><div class="f"><div class="ic">${a.i}</div><b>${a.n}</b><small>${a.s||"Klick zum Umdrehen"}</small></div><div class="b">${a.t}</div></div>`;
+ d.onclick=()=>d.classList.toggle("on");c.appendChild(d);});}
+
+/* ===== Entscheidungsbaum ===== */
+function wizard(elId,nodes,start,station){
+ const el=$(elId);let hist=[];
+ function render(id){const n=nodes[id];
+  let h=`<div class="path">${hist.length?"Schritt "+(hist.length+1):"Start"}</div>`;
+  if(n.end){h+=`<div class="end ${n.type}">${n.type==="stop"?'<span class="stopsign">STOP</span>':""}${n.end}</div>`;
+   if(station!==undefined)markDone(station);}
+  else{h+=`<div class="q">${n.q}</div>${n.hint?`<div class="hint">${n.hint}</div>`:""}`+n.o.map((o,k)=>`<button class="choice" data-k="${k}">${o.t}</button>`).join("");}
+  h+=`<div style="margin-top:10px">${hist.length?'<button class="btn small sec" data-a="back">← zurück</button>':""}<button class="btn small sec" data-a="reset">↺ neu starten</button></div>`;
+  el.innerHTML=h;
+  el.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{hist.push(id);render(n.o[+b.dataset.k].n);});
+  const bk=el.querySelector('[data-a="back"]');if(bk)bk.onclick=()=>render(hist.pop());
+  el.querySelector('[data-a="reset"]').onclick=()=>{hist=[];render(start);};}
+ render(start);
+}
+
+/* ===== S0 Konsum-Check ===== */
+const CQ=[
+ {q:"Wie oft kaufst du dir etwas spontan, das du vorher gar nicht kaufen wolltest?",o:["Mehrmals pro Woche","Ein paar Mal im Monat","Selten"]},
+ {q:"Wie viele deiner Kleidungsstücke hast du im letzten Jahr nicht ein einziges Mal getragen?",o:["Sehr viele","Einige","Kaum welche"]},
+ {q:"Wie alt ist dein Smartphone?",o:["Höchstens 1 Jahr","1–3 Jahre","Älter als 3 Jahre"]},
+ {q:"Shoppen (online oder in der Stadt) ist für mich …",o:["… ein Hobby, das ich oft mache","… manchmal Zeitvertreib","… nur, wenn ich etwas brauche"]},
+ {q:"Wenn ich gestresst oder gelangweilt bin, …",o:["… kaufe ich mir oft etwas","… schaue ich zumindest gern in Shops/Apps","… mache ich etwas anderes"]},
+ {q:"Was passiert mit Dingen, die du nicht mehr brauchst?",o:["Müll oder sie liegen in der Schublade","Mal so, mal so","Ich verschenke, verkaufe oder tausche sie"]},
+ {q:"Wie oft leihst oder kaufst du Dinge gebraucht?",o:["Nie","Gelegentlich","Oft"]},
+ {q:"Wie stark beeinflussen dich Influencer und Werbung beim Kaufen?",o:["Stark","Ein bisschen","Kaum"]}
+];
+(function(){const c=$("checkQs");
+ CQ.forEach((x,i)=>{const d=document.createElement("div");d.className="card";
+  d.innerHTML=`<b>${i+1}. ${x.q}</b>`+x.o.map((t,k)=>`<button class="choice" data-q="${i}" data-k="${k}">${t}</button>`).join("");c.appendChild(d);});
+ c.addEventListener("click",e=>{const b=e.target.closest(".choice");if(!b)return;
+  c.querySelectorAll(`.choice[data-q="${b.dataset.q}"]`).forEach(x=>x.classList.remove("sel"));b.classList.add("sel");});
+})();
+function evalCheck(){
+ const ans=CQ.map((x,i)=>{const s=document.querySelector(`#checkQs .choice.sel[data-q="${i}"]`);return s?+s.dataset.k:null;});
+ if(ans.includes(null)){alert("Bitte beantworte alle Fragen.");return;}
+ S.check=ans;save();const p=ans.reduce((a,b)=>a+b,0),m=CQ.length*2,pc=p/m;
+ const typ=pc<0.4?["🛍️ Konsum-Autopilot","Du kaufst viel – oft ohne lange nachzudenken. Kein Vorwurf: Genau dafür sind Werbung und Shops gemacht. Diese Seite zeigt dir, wie du wieder selbst am Steuer sitzt."]
+  :pc<0.75?["⚖️ Gelegenheits-Shopper","Du bist schon recht bewusst unterwegs, lässt dich aber manchmal von Reizen und Stimmungen leiten. Phase 4 (Dranbleiben) ist für dich besonders spannend."]
+  :["🌱 Bewusst-Konsument/in","Du kaufst überlegt und nutzt Dinge lange. Achte trotzdem auf die Fallen in Station 5 – sie erwischen gerade die Bewussten!"];
+ $("checkRes").style.display="block";
+ $("checkRes").innerHTML=`<div class="result-ring">${p} / ${m}</div><h3 style="margin-top:4px">${typ[0]}</h3><p>${typ[1]}</p><p style="font-size:15px;color:var(--muted)">Am Ende (Station 10) kannst du überlegen, was du ändern möchtest.</p>`;
+ markDone(0);
+}
+
+/* ===== S1 Schätzfragen ===== */
+const GQ=[
+ {q:"In deutschen Kleiderschränken hängen rund 5 Milliarden Kleidungsstücke. Wie viele davon werden <b>nie</b> getragen?",min:0,max:3000,step:100,unit:" Mio.",start:300,ans:1000,
+  r:"Rund <b>1 Milliarde</b> Kleidungsstücke werden nie getragen – das ist jedes fünfte! Eine weitere Milliarde wird seltener als viermal im Jahr getragen."},
+ {q:"Wie viel Prozent der Deutschen nutzen ein Smartphone, das <b>älter als 3 Jahre</b> ist?",min:0,max:100,step:1,unit:" %",start:40,ans:11,
+  r:"Nur <b>11 Prozent</b>. Mehr als die Hälfte nutzt ein Handy, das höchstens ein Jahr alt ist."},
+ {q:"Wie viele ausrangierte Handys liegen schätzungsweise ungenutzt in deutschen Schubladen?",min:0,max:500,step:10,unit:" Mio.",start:50,ans:200,
+  r:"Rund <b>200 Millionen</b> Althandys – mit wertvollen Rohstoffen wie Gold, Kupfer und seltenen Metallen."},
+ {q:"Wie viel Kilogramm Abfall verursacht jede Person in Deutschland pro Jahr (Haushaltsabfälle)?",min:0,max:1000,step:10,unit:" kg",start:150,ans:483,
+  r:"<b>483 kg</b> pro Person und Jahr – davon rund 10 kg Elektroschrott."},
+ {q:"Wie viel Geld wurde 2022 in Deutschland insgesamt für Werbung ausgegeben?",min:0,max:100,step:1,unit:" Mrd. €",start:10,ans:48,
+  r:"Rund <b>48 Milliarden Euro</b> – Geld, das nur ein Ziel hat: dass mehr gekauft wird."}
+];
+(function(){const c=$("guesses");let done=0;
+ GQ.forEach((g,i)=>{const d=document.createElement("div");d.className="card";
+  d.innerHTML=`<p style="margin-top:0">${i+1}. ${g.q}</p><input type="range" min="${g.min}" max="${g.max}" step="${g.step}" value="${g.start}"><div class="big"><span>${fmt(g.start)}</span>${g.unit}</div><button class="btn small">Auflösen</button><div class="fb ok"></div>`;
+  const sl=d.querySelector("input"),sp=d.querySelector(".big span"),fb=d.querySelector(".fb");
+  sl.oninput=()=>sp.textContent=fmt(+sl.value);
+  d.querySelector("button").onclick=()=>{if(fb.classList.contains("show"))return;fb.classList.add("show");
+   const dev=Math.abs(+sl.value-g.ans)/(g.max-g.min);
+   fb.innerHTML=`Dein Tipp: ${fmt(+sl.value)}${g.unit}. ${g.r} ${dev<0.08?"👏 Sehr gut geschätzt!":""}`;
+   if(++done===GQ.length)markDone(1);};
+  c.appendChild(d);});
+})();
+
+/* ===== S2 ===== */
+sortGame("sortSym","sortSymScore",["nach innen","nach außen"],[
+ {t:"„Nach der Mathe-Schulaufgabe hab ich mir die Kopfhörer einfach verdient.“",a:0,e:"Belohnung – der Kauf soll ein gutes Gefühl erzeugen."},
+ {t:"„In meiner Clique tragen alle diese Sneaker-Marke.“",a:1,e:"Zugehörigkeit zu einer Gruppe zeigen."},
+ {t:"„Mit dem neuen Handy sehen alle, dass ich mir was leisten kann.“",a:1,e:"Status nach außen demonstrieren."},
+ {t:"„Mir ging’s mies, da hab ich mir drei Shirts bestellt.“",a:0,e:"Ausgleich für ein schlechtes Gefühl („Frustkauf“)."},
+ {t:"„Mainstream-Marken trage ich nicht – ich will nicht aussehen wie alle.“",a:1,e:"Abgrenzung von anderen ist ebenfalls eine Außenwirkung."},
+ {t:"„Mit dem teuren Parfum fühle ich mich einfach selbstbewusster.“",a:0,e:"Steigerung des Selbstwertgefühls."}
+],2);
+flipCards("folgenCards",[
+ {i:"😕",n:"Für dein Wohlbefinden",t:"Kaufen fühlt sich kurz gut an, zahlt sich langfristig aber selten aus. Wem Geld, Statussymbole und teure Kleidung besonders wichtig sind, der ist im Schnitt weniger zufrieden."},
+ {i:"📦",n:"Für deinen Alltag",t:"Jedes Ding bringt Arbeit mit: auspacken, ausprobieren, verstauen, pflegen, reparieren. Unordnung durch zu viele Dinge belastet."},
+ {i:"🌍",n:"Für die Umwelt",t:"Herstellung verbraucht Energie, Rohstoffe und Fläche. Es entsteht viel Abfall, der großteils verbrannt statt recycelt wird – das verursacht Emissionen und trägt zum Klimawandel bei."}
+]);
+
+/* ===== S3 ===== */
+sortGame("sortFromm","sortFrommScore",["Haben","Sein"],[
+ {t:"Ich definiere mich über meine Marken-Klamotten.",a:0},
+ {t:"Ich lerne Gitarre und spiele mit Freunden.",a:1},
+ {t:"Ich leihe meiner Nachbarin mein Fahrrad.",a:1},
+ {t:"Woher mein Shirt kommt, ist mir egal – Hauptsache, es gehört mir.",a:0,e:"Laut Fromm wird beim Haben die Herkunft der Dinge nicht hinterfragt."},
+ {t:"Ich engagiere mich in der Umwelt-AG.",a:1,e:"Mitbestimmen und Gemeinschaft gehören zum Sein."},
+ {t:"Je mehr ich besitze, desto mehr bin ich wert.",a:0}
+],3);
+
+/* ===== S4 ===== */
+sortGame("sortFalle","sortFalleScore",["Ästhetik-Falle","Moral. Lizenzierung","Rebound"],[
+ {t:"Lea hat ihr Zimmer ausgemistet. Jetzt kauft sie neue Regale, Körbe und Deko „im cleanen Skandi-Look“.",a:0,e:"Der minimalistische Look erfordert Neuanschaffungen."},
+ {t:"Tim hat 20 Teile auf Vinted verkauft und sich vom Erlös direkt neue Sneaker bestellt – „hab ja Platz gemacht“.",a:1,e:"Das gute Gefühl rechtfertigt den nächsten Kauf."},
+ {t:"Familie K. kauft kaum noch Neues – vom gesparten Geld fliegt sie zweimal im Jahr in den Urlaub.",a:2,e:"Gespartes Geld fließt in eine sehr klimaschädliche Aktivität."},
+ {t:"Ein Influencer zeigt „die 12 Basics, die in jede Kapselgarderobe gehören“ – mit Rabattcode.",a:0,e:"Die Kapselgarderobe wird zum Verkaufsargument."},
+ {t:"„Ich nehme ja immer meine Stofftasche mit, da kann ich mir den dritten Hoodie diesen Monat schon leisten.“",a:1,e:"Eine „gute Tat“ wird zur Erlaubnis für Konsum."}
+]);
+function calcRebound(){const v=+$("rbSl").value;$("rbV").textContent=v+" €";$("rbY").textContent=fmt(v*12)+" €";$("rb3").textContent=fmt(v*36)+" €";}
+const RB=[
+ {t:"✈️ Wochenendtrip mit dem Flugzeug",f:"Rebound-Gefahr! Laut Umweltbundesamt spart allein ein Urlaub ohne Flug rund 1 Tonne CO₂ im Jahr – mehr als das, was du mit weniger Shopping meist einsparst. Die Umweltbilanz kann so unterm Strich schlechter werden.",c:"no"},
+ {t:"🎸 Erlebnisse in der Nähe: Konzert, Kletterhalle, Kino mit Freunden",f:"Gute Wahl: Erlebnisse verbrauchen meist deutlich weniger Ressourcen als neue Dinge – und machen laut Forschung länger glücklich.",c:"ok"},
+ {t:"🐷 Sparen oder nachhaltig anlegen (z. B. für Führerschein, Ausbildung)",f:"Sehr gut. Bei der Geldanlage kannst du auch auf Nachhaltigkeitskriterien achten (→ Thema Geldanlage im Unterricht).",c:"ok"},
+ {t:"🎮 Endlich die neue Spielkonsole kaufen",f:"Dann wäre die Ersparnis direkt wieder in neuen Konsum geflossen – mit Herstellung, Rohstoffen und später Elektroschrott.",c:"no"}
+];
+(function(){const c=$("rbChoices"),fb=$("rbFb");
+ RB.forEach(r=>{const b=document.createElement("button");b.className="choice";b.textContent=r.t;
+  b.onclick=()=>{c.querySelectorAll(".choice").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");fb.className="fb show "+r.c;fb.textContent=r.f;markDone(4);};
+  c.appendChild(b);});})();
+
+/* ===== S5 Phase 1 ===== */
+const BEREICHE=["Kleidung","Technik & Elektronik","Sport","Spiele","Bücher","Musik","Möbel","Basteln","Unterhaltungsmedien","Küche","Kunst","Büroartikel/Schulsachen"];
+$("ldBer").innerHTML=BEREICHE.map(b=>`<option>${b}</option>`).join("");
+function analyseWishes(){
+ const m=$("more").value.trim(),l=$("less").value.trim();const fb=$("wishFb");fb.classList.add("show");
+ if(!m){fb.textContent="Schreib zuerst auf, wovon du dir mehr wünschst.";return;}
+ const imm=/zeit|freund|familie|urlaub|reise|erleb|ruhe|schlaf|sport|natur|spaß|liebe|gesund|musik|hobby|lernen|konzert/i.test(m);
+ fb.innerHTML=(imm?"Spannend: In deiner „Mehr“-Liste stehen offenbar auch <b>immaterielle Wünsche</b> (Zeit, Menschen, Erlebnisse). Damit bist du nicht allein: Im Forschungsprojekt waren Beziehungen und Erlebnisse für viel mehr Menschen wichtig als Besitz. ":"Deine „Mehr“-Liste ist eher materiell. Frag dich: Welches Bedürfnis steckt hinter jedem Wunsch – und ließe es sich auch ohne Kauf erfüllen? ")
+  +"<br><b>Weiterdenken:</b> Wie viele deiner Käufe im letzten Monat haben dich deinen „Mehr“-Wünschen wirklich nähergebracht?";
+}
+function addCountRow(c="",n="",u=""){const t=$("countTbl"),r=t.insertRow();
+ r.innerHTML=`<td><input type="text" value="${c}" placeholder="z. B. Hoodies"></td><td><input type="number" min="0" value="${n}"></td><td><input type="number" min="0" value="${u}"></td>`;}
+["T-Shirts","Hosen","Hoodies/Pullis","Schuhe"].forEach(k=>addCountRow(k));
+function calcCount(){let n=0,u=0;[...$("countTbl").rows].slice(1).forEach(r=>{const i=r.querySelectorAll("input");n+=+i[1].value||0;u+=+i[2].value||0;});
+ const fb=$("countFb");fb.classList.add("show");
+ if(!n){fb.textContent="Trag zuerst deine Zahlen ein.";return;}
+ const p=Math.round(u/n*100);
+ fb.innerHTML=`Du besitzt in diesem Bereich <b>${n} Dinge</b>, davon <b>${u} ungenutzt (${p} %)</b>.<br>Zum Vergleich: Bei Kleidung wird deutschlandweit etwa jedes fünfte Teil (20 %) nie getragen. ${p>20?"Du liegst darüber – hier steckt Potenzial für Phase 2 und 3!":"Du liegst darunter – gut!"}`;
+}
+
+/* ===== S6 Phase 2 ===== */
+flipCards("methodCards",[
+ {i:"✨",n:"KonMari",t:"Nur behalten, was Freude macht. Kategorie für Kategorie vorgehen: Kleidung → Bücher → Papiere → Kleinkram → zuletzt Erinnerungsstücke."},
+ {i:"🎲",n:"Minimalist Game",t:"Einen Monat lang: am Tag 1 ein Ding weggeben, an Tag 2 zwei, an Tag 3 drei … (siehe Rechner unten)."},
+ {i:"📦",n:"Vier Kisten",t:"Vier Kisten beschriften: Abfall – Verschenken – Behalten – Vielleicht behalten. Jedes Ding in die Hand nehmen und zuordnen."},
+ {i:"🗓️",n:"Leave-it-Methode",t:"Einen Bereich und einen Zeitraum wählen (z. B. 4 Wochen). Jeden Tag ca. 3 Dinge aussortieren. Wichtig: Innerhalb von 2 Wochen müssen sie das Haus wirklich verlassen!"},
+ {i:"❤️",n:"Love-it-Methode",t:"Nur behalten, was dir wirklich am Herzen liegt – weil es nützlich ist, glücklich macht, Erinnerungen trägt oder oft gebraucht wird."},
+ {i:"🔀",n:"Mix & Match",t:"Eigene Methode oder Kombination – Hauptsache, du nimmst dir Zeit, die Dinge bewusst anzuschauen, und dokumentierst, wie viel du aussortierst."}
+]);
+function calcMG(){const n=+$("mgSl").value;$("mgV").textContent=n;$("mgOut").textContent=fmt(n*(n+1)/2)+" Dinge";}
+const LOVE=[
+ {d:"👕 Festival-Shirt von 2023, seit einem Jahr nicht getragen, erinnert an ein tolles Wochenende"},
+ {d:"🎧 Alte Kabel-Kopfhörer, du nutzt nur noch die kabellosen"},
+ {d:"⚽ Fußballschuhe, eine Nummer zu klein"},
+ {d:"📚 Lieblingsbuch aus der 5. Klasse, schon dreimal gelesen"},
+ {d:"🧢 Cap, nur gekauft, weil sie im Sale war – nie getragen"},
+ {d:"🔌 Ladegerät, das du täglich nutzt"}
+];
+const CRIT=["nützlich","macht mich glücklich","schöne Erinnerung","oft gebraucht"];
+const loveRes={};
+(function(){const c=$("loveIt");
+ LOVE.forEach((it,i)=>{const d=document.createElement("div");d.className="itemcard";
+  d.innerHTML=`<b>${it.d}</b><div class="crit">${CRIT.map((k,j)=>`<span class="chip" data-j="${j}">${k}</span>`).join("")}</div>
+   <button class="btn small" data-v="keep">Behalten</button><button class="btn small sec" data-v="go">Weggeben</button><div class="fb"></div>`;
+  d.querySelectorAll(".chip").forEach(ch=>ch.onclick=()=>ch.classList.toggle("sel"));
+  d.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{
+   const n=d.querySelectorAll(".chip.sel").length,keep=b.dataset.v==="keep",fb=d.querySelector(".fb");
+   loveRes[i]=keep;fb.classList.add("show");
+   if(keep&&n===0){fb.className="fb show no";fb.textContent="Du behältst es, obwohl kein Kriterium zutrifft. Ist das der Besitztumseffekt?";}
+   else if(!keep&&n>=2){fb.className="fb show neu";fb.textContent="Mehrere Gründe sprechen fürs Behalten – sicher, dass es gehen soll?";}
+   else{fb.className="fb show ok";fb.textContent=keep?"Begründet behalten – passt zur Love-it-Methode.":"Konsequent! Jetzt fehlt nur noch der richtige Weg der Weitergabe (→ Station 8).";}
+   if(Object.keys(loveRes).length===LOVE.length){const g=Object.values(loveRes).filter(v=>!v).length;
+    $("loveSum").style.display="block";$("loveSum").innerHTML=`Du würdest <b>${g} von ${LOVE.length}</b> Dingen weggeben. Probier die Methode jetzt zu Hause an einer Schublade oder einem Regalfach aus!`;markDone(6);}
+  });
+  c.appendChild(d);});})();
+
+/* ===== S7 Phase 3 ===== */
+wizard("wizDisp",{
+ a:{q:"Ist das Ding in gutem Zustand, sodass es einfach weitergenutzt werden kann?",o:[{t:"Ja",n:"b"},{t:"Nein, es ist kaputt oder abgenutzt",n:"f"}]},
+ b:{q:"Kennst du jemanden, der es brauchen könnte?",hint:"Geschwister, Cousinen, Freunde, Nachbarn, Mitschüler …",o:[{t:"Ja",n:"c"},{t:"Nein",n:"d"}]},
+ c:{end:"<b>Frag gleich nach</b>, ob die Person es haben möchte – verschenken oder tauschen ist der einfachste und nachhaltigste Weg.",type:"go"},
+ d:{q:"Gibt es in deiner Nähe eine Stelle, die es weitergibt?",hint:"Tauschladen, Secondhandladen, Sozialkaufhaus, öffentlicher Bücherschrank, Flohmarkt …",o:[{t:"Ja",n:"e1"},{t:"Nein / weiß nicht",n:"e"}]},
+ e1:{end:"<b>Bring es dorthin.</b> Lokal weitergeben ist am nachhaltigsten – keine langen Transportwege.",type:"go"},
+ e:{q:"Gibt es eine Plattform oder Organisation, die es an andere weitergeben kann (auch online)?",hint:"Verschenk- oder Verkaufsplattformen, Spendenorganisationen (vorher prüfen, ob seriös!)",o:[{t:"Ja",n:"e2"},{t:"Nein",n:"z"}]},
+ e2:{end:"<b>Online verkaufen, verschenken oder spenden.</b> Verkaufen macht mehr Arbeit (Fotos, Anfragen, Versand), bringt aber Geld. Bei Spenden: Prüfe, ob die Organisation transparent arbeitet.",type:"go"},
+ f:{q:"Lässt es sich relativ einfach reparieren oder aufwerten?",o:[{t:"Ja",n:"g"},{t:"Nein",n:"j"}]},
+ g:{q:"Hast du Lust, Zeit, die Fähigkeiten und das Werkzeug, es selbst zu reparieren?",hint:"Anleitungen gibt es online für fast alles – vom Loch im Pulli bis zum Handy-Akku.",o:[{t:"Ja",n:"h"},{t:"Nein",n:"i"}]},
+ h:{end:"<b>Plane ein festes Zeitfenster</b> in deinem Kalender, um es innerhalb einer Woche zu reparieren. Sonst landet es wieder in der Ecke!",type:"go"},
+ i:{q:"Gibt es ein Repair-Café oder jemanden, der beim Reparieren hilft?",o:[{t:"Ja",n:"i2"},{t:"Nein",n:"j"}]},
+ i2:{end:"<b>Ab ins Repair-Café!</b> Dort reparieren Ehrenamtliche gemeinsam mit dir – kostenlos und lehrreich.",type:"go"},
+ j:{q:"Können Teile davon weiterverwendet oder kreativ umgestaltet werden (Upcycling)?",o:[{t:"Ja",n:"k"},{t:"Nein",n:"z"}]},
+ k:{end:"<b>Upcycling!</b> Aus der alten Jeans wird eine Tasche, aus dem T-Shirt ein Putzlappen. Oder gib die Teile jemandem, der sie verwerten kann.",type:"mid"},
+ z:{end:"<b>Bedank dich bei dem Ding für die gemeinsame Zeit</b> und entsorge es möglichst umweltfreundlich: Wertstoffhof, Elektro-Rücknahme im Handel, Batteriesammelbox – nicht einfach in den Restmüll.",type:"mid"}
+},"a",7);
+sortGame("sortWeg","sortWegScore",["Recycling","Upcycling","Reparatur","Weitergabe"],[
+ {t:"Aus alten Jeans eine Umhängetasche nähen",a:1,e:"Upcycling: Das Material behält seine Form und bekommt eine neue Funktion."},
+ {t:"PET-Flaschen werden eingeschmolzen und zu Fasern verarbeitet",a:0,e:"Recycling: Das Material wird zerkleinert/geschmolzen und neu verarbeitet."},
+ {t:"Den Handy-Akku tauschen lassen",a:2},
+ {t:"Die zu klein gewordene Jacke an den jüngeren Cousin geben",a:3},
+ {t:"Aus einer Weinflasche einen Kerzenständer basteln",a:1},
+ {t:"Ein Loch im Pulli stopfen",a:2},
+ {t:"Bücher in den öffentlichen Bücherschrank stellen",a:3}
+]);
+
+/* ===== S8 Phase 4 ===== */
+wizard("wizKauf",{
+ a:{q:"Welches Bedürfnis steckt hinter dem Kaufwunsch?",o:[{t:"Lust auf etwas Neues",n:"b"},{t:"Trost oder Belohnung",n:"b"},{t:"Langeweile / Erholung",n:"b"},{t:"Ich brauche es für etwas Konkretes",n:"c"}]},
+ b:{q:"Kannst du dieses Bedürfnis auch ohne ein neues Ding befriedigen?",hint:"z. B. Freunde treffen, raus in die Natur, Sport, lesen, etwas Neues lernen",o:[{t:"Ja, das probiere ich",n:"b1"},{t:"Nein, ich brauche das Ding",n:"c"}]},
+ b1:{end:"Super – Bedürfnis erkannt, ohne Kauf gestillt. Genau so entsteht eine neue Gewohnheit.",type:"stop"},
+ c:{q:"Kannst du das Ding bekommen, ohne es neu zu kaufen?",hint:"Ausleihen (Freunde, Bibliothek, Leihplattform) oder gebraucht kaufen",o:[{t:"Ja",n:"c1"},{t:"Nein",n:"d"}]},
+ c1:{end:"<b>Leih es dir aus oder kauf es gebraucht.</b> Dein Bedürfnis ist erfüllt, und es muss nichts Neues produziert werden.",type:"stop"},
+ d:{q:"Besitzt oder besaßt du so ein Ding schon?",o:[{t:"Ja",n:"e"},{t:"Nein, es wäre eine Erstanschaffung",n:"g"}]},
+ e:{q:"Warum willst du ein neues kaufen?",o:[{t:"Das alte ist kaputt (nicht reparierbar) oder aufgebraucht",n:"ok"},{t:"Das neue ist einfach besser",n:"f"},{t:"Ich will einfach dieses neue Ding",n:"g"}]},
+ f:{end:"<b>Bist du dir wirklich sicher?</b> Dein altes Ding funktioniert noch. Am klügsten: noch mindestens eine Nacht darüber schlafen.",type:"stop"},
+ g:{q:"Denkst du schon länger über diesen Kauf nach?",o:[{t:"Ja, das plane ich schon sehr lange",n:"ok"},{t:"Nein, ich habe mich gerade frisch verliebt",n:"h"}]},
+ h:{end:"<b>Typischer Impulskauf!</b> Setz das Ding auf eine Wunschliste und warte ein bis zwei Wochen. Willst du es dann immer noch, entscheide bewusst.",type:"stop"},
+ ok:{end:"<b>Okay, kauf es – aber bewusst:</b> möglichst langlebig, reparierbar und fair hergestellt („Klasse statt Masse“). Dann: pflegen, reparieren und genießen. Wer achtsam mit seinen Dingen umgeht, braucht insgesamt weniger.",type:"go"}
+},"a",8);
+const TRIG=[["📱","Werbung auf Instagram/TikTok"],["😩","Stress oder schlechte Laune"],["🥱","Langeweile"],["⏰","„Nur heute“-Angebote, Rabattcodes"],["👯","Shoppen mit Freunden"],["💸","Gerade Taschengeld bekommen"],["🏆","Belohnung nach etwas Anstrengendem"],["🔔","Push-Nachrichten von Shopping-Apps"]];
+(function(){const c=$("trigChips");
+ TRIG.forEach(t=>{const s=document.createElement("span");s.className="chip";s.textContent=t[0]+" "+t[1];
+  s.onclick=()=>{s.classList.toggle("sel");const n=c.querySelectorAll(".chip.sel").length;const fb=$("trigFb");fb.classList.toggle("show",n>0);
+   fb.innerHTML=`Du hast <b>${n}</b> Auslöser erkannt. Überlege für jeden: Was kann ich in diesem Moment stattdessen tun? (z. B. App-Benachrichtigungen ausschalten, Werbe-Accounts entfolgen, tief durchatmen und 10 Minuten rausgehen, Wunschliste statt Warenkorb).`;};
+  c.appendChild(s);});})();
+flipCards("tipCards",[
+ {i:"🎯",n:"Klare Vorgaben",t:"Konkrete Ziele setzen, z. B. ein festes Monatsbudget für Konsum oder höchstens ein Kauf pro Woche."},
+ {i:"📝",n:"Verhalten verfolgen",t:"Notieren, wann du was gekauft hast (außer Lebensmittel). So siehst du, ob du deine Ziele erreichst."},
+ {i:"⏳",n:"Belohnung aufschieben",t:"Klein anfangen: eine Woche lang keine Impulskäufe. Dann die Dauer langsam steigern."},
+ {i:"🚨",n:"Auslöser erkennen",t:"Wer seine Auslöser kennt, kann sich vorbereiten – durchatmen, ablenken, Wunschliste statt Warenkorb."},
+ {i:"🧘",n:"Stress senken",t:"Shoppen bringt einen kurzen Glücks-Kick. Sport, Schlaf oder Entspannung helfen, ihn zu ersetzen – und stärken die Selbstkontrolle."}
+]);
+function revealHab(){const v=+$("habSl").value,fb=$("habFb");fb.classList.add("show");
+ fb.innerHTML=`Dein Tipp: ${v} Tage. Oft liest man „21 Tage“ – das ist ein Mythos. Laut Forschung dauert es <b>durchschnittlich etwa 66 Tage</b>, bis ein neues Verhalten eine feste Gewohnheit ist. Wichtigster Tipp: Geduld mit dir selbst! Leichter wird es in Umbruchphasen (z. B. Schulwechsel, neues Schuljahr).`;}
+
+/* ===== S9 Szenarien ===== */
+const SC=[
+ {t:"🧺 Du hast deinen Kleiderschrank ausgemistet – drei volle Säcke! Deine Freundin: „Jetzt ist Platz, lass shoppen gehen!“",o:[
+  {a:"Klar, das hab ich mir verdient!",u:0,g:0,w:1,f:"Moralische Lizenzierung: Das Ausmisten wird zur Erlaubnis für Neukauf – der Platz ist schnell wieder voll."},
+  {a:"Vorschlag: Wir organisieren eine Kleidertauschparty",u:2,g:2,w:2,f:"Perfekt: Neues für dich, ohne dass etwas produziert werden muss – und es macht Spaß mit anderen."},
+  {a:"Lieber was unternehmen: Eis essen und an die Salzach",u:2,g:1,w:2,f:"Erlebnis statt Ding – das Bedürfnis nach Zeit mit der Freundin wird erfüllt."}]},
+ {t:"📸 Eine Influencerin zeigt „10 Must-haves für deinen minimalistischen Kleiderschrank“ – mit 20 % Rabattcode.",o:[
+  {a:"Ich bestelle die Basics, die mir noch fehlen",u:0,g:0,w:1,f:"Ästhetik-Falle: Minimalismus wird zum Verkaufsargument. Echter Minimalismus nutzt, was schon da ist."},
+  {a:"Ich kombiniere eine Kapselgarderobe aus dem, was ich schon habe",u:2,g:2,w:2,f:"Genau das ist der Gedanke: weniger Teile, die du schon besitzt, kreativ kombinieren."},
+  {a:"Ich entfolge Accounts, die mich ständig zum Kaufen bringen",u:2,g:2,w:2,f:"Werbeeinflüsse reduzieren ist einer der Tipps aus dem Ratgeber – sehr wirksam!"}]},
+ {t:"🎮 Deine alte Spielkonsole liegt seit einem Jahr im Schrank. Sie funktioniert noch.",o:[
+  {a:"Restmüll – weg ist weg",u:0,g:0,w:1,f:"Das ist verboten (Elektroschrott!) und verschwendet ein funktionierendes Gerät samt wertvoller Rohstoffe."},
+  {a:"Über eine Plattform verkaufen",u:2,g:2,w:1,f:"Gut: Das Gerät wird weitergenutzt, du bekommst Geld. Kostet etwas Zeit für Fotos und Anfragen."},
+  {a:"Meinem kleinen Cousin schenken",u:2,g:1,w:2,f:"Weitergabe im eigenen Umfeld: am einfachsten, ohne Transportwege – und jemand freut sich."}]},
+ {t:"📱 Abends, du bist gestresst. Beim Scrollen hast du in der Shopping-App schon 70 € im Warenkorb.",o:[
+  {a:"Bestellen – dann fühl ich mich besser",u:0,g:0,w:0,f:"Typischer Auslöser (Stress) mit sofortiger Belohnung. Das gute Gefühl hält meist nicht lange."},
+  {a:"Warenkorb als Wunschliste speichern und in einer Woche nochmal schauen",u:2,g:2,w:1,f:"Belohnung aufschieben: Oft ist der Kaufwunsch nach ein paar Tagen weg."},
+  {a:"Handy weg, kurz raus oder Sport machen",u:2,g:2,w:2,f:"Du ersetzt den „Kauf-Kick“ durch etwas, das Stress wirklich senkt – das trainiert den Selbstkontroll-Muskel."}]},
+ {t:"🔋 Der Akku deines 2 Jahre alten Handys hält nur noch einen halben Tag. Alle Freunde haben das neue Modell.",o:[
+  {a:"Neues Top-Modell kaufen",u:0,g:0,w:1,f:"Status und Zugehörigkeit (symbolischer Konsum!). Ein neues Handy verursacht den größten Teil seiner Umweltbelastung bei der Herstellung."},
+  {a:"Akku tauschen lassen",u:2,g:2,w:2,f:"Genau das empfiehlt der Ratgeber als neue Gewohnheit: reparieren statt ersetzen."},
+  {a:"Ein generalüberholtes Gerät kaufen und das alte verkaufen",u:1,g:1,w:1,f:"Besser als neu – aber das eigene Gerät zu reparieren wäre noch nachhaltiger."}]},
+ {t:"⛺ Du gehst im Sommer zum ersten Mal zelten – nur für ein Wochenende.",o:[
+  {a:"Komplette Campingausrüstung neu kaufen",u:0,g:0,w:1,f:"Für ein Wochenende viel Geld und Ressourcen – danach liegt alles im Keller."},
+  {a:"Zelt und Isomatte bei Freunden oder über eine Leihplattform leihen",u:2,g:2,w:2,f:"Sharing: Bedürfnis erfüllt, ohne zu besitzen – und vielleicht ein netter Kontakt dazu."},
+  {a:"Gebrauchtes Zelt kaufen, falls es mir gefällt, gehe ich öfter",u:1,g:1,w:2,f:"Gute Lösung, wenn du wirklich regelmäßig zelten willst."}]}
+];
+const SCres=[];
+(function(){const c=$("scen");
+ SC.forEach((x,i)=>{const d=document.createElement("div");d.className="card";
+  d.innerHTML=`<p style="font-size:18px;margin-top:0"><b>Situation ${i+1}</b><br>${x.t}</p>`+x.o.map(o=>`<button class="choice">${o.a}</button>`).join("")+`<div class="fb neu"></div>`;
+  const bs=d.querySelectorAll(".choice"),fb=d.querySelector(".fb");
+  bs.forEach((b,k)=>b.onclick=()=>{bs.forEach(y=>y.classList.remove("sel"));b.classList.add("sel");const o=x.o[k];SCres[i]=o;
+   const st=v=>["🔴","🟡","🟢"][v];fb.classList.add("show");
+   fb.innerHTML=`${o.f}<div class="meter"><span>${st(o.u)} Umwelt</span><span>${st(o.g)} Geldbeutel</span><span>${st(o.w)} Wohlbefinden</span></div><small>Klick auch die anderen Optionen an und vergleiche.</small>`;
+   if(SCres.filter(Boolean).length===SC.length)scenSummary();});
+  c.appendChild(d);});})();
+function scenSummary(){const t=SCres.reduce((a,o)=>({u:a.u+o.u,g:a.g+o.g,w:a.w+o.w}),{u:0,g:0,w:0}),m=SC.length*2;
+ $("scenSum").style.display="block";
+ $("scenSum").innerHTML=`<h3 style="margin-top:0">Deine Bilanz</h3><div class="bars">${[["Umwelt",t.u,"#1f6f5c"],["Geldbeutel",t.g,"#2f6690"],["Wohlbefinden",t.w,"#6b5b9a"]].map(r=>`<div class="bar"><span>${r[0]}</span><div class="track"><div class="fill" style="width:${r[1]/m*100}%;background:${r[2]}"></div></div><span class="val">${r[1]}/${m}</span></div>`).join("")}</div>
+ <p>Fällt dir etwas auf? Die Option, die der Umwelt am meisten hilft, schont oft auch deinen Geldbeutel – und macht nicht unglücklicher. <b>Weniger kann tatsächlich mehr sein.</b></p>`;}
+
+/* Challenge */
+const CH=[
+ {n:"🚫🛍️ Konsum-Detox",d:"4 Wochen lang nichts kaufen, was über den Alltagsbedarf (Essen, Hygiene, Schulsachen) hinausgeht – komplett oder in einem Bereich.",f:`<label class="f">Detox-Bereich</label><select data-k="ber"><option>Kompletter Detox</option>${BEREICHE.map(b=>`<option>${b}</option>`).join("")}</select><label class="f">Was wird mir leichtfallen? Was schwer?</label><textarea data-k="ls"></textarea>`,rows:["Woche ohne Neukauf geschafft?","Tagebuch: schwierige Situation gemeistert?"]},
+ {n:"📋 Nicht-Einkaufsliste",d:"Überlege, welche Käufe du bereust, und schreib auf, was du 4 Wochen lang bewusst NICHT kaufst. Die Liste darf wachsen.",f:`<label class="f">Diese Dinge kaufe ich nicht <small>(z. B. Fast-Fashion-Shirts, Energy-Drinks, Gaming-Skins, Online-Bestellungen)</small></label><textarea data-k="list"></textarea>`,rows:["Liste eingehalten?","Neue Punkte ergänzt?"]},
+ {n:"🌳 Aktivitäten ohne Kaufen",d:"Plane jede Woche bewusst schöne Aktivitäten, die ohne Geldausgeben auskommen – und frag dich vor jedem Kauf, ob es eine Alternative gibt.",f:`<label class="f">Meine Ideen <small>(z. B. Radtour, Spieleabend mit vorhandenen Spielen, Tauschparty, Freibad mit Jahreskarte)</small></label><textarea data-k="akt"></textarea>`,rows:["Mind. 1 Aktivität ohne Kaufen gemacht?","Vor einem Kauf eine Alternative gefunden?"]}
+];
+const AMP=["#ddd","#3a9c7d","#e0b43a","#c2493d"];
+function renderChal(){const c=$("chalPick");c.innerHTML="";
+ CH.forEach((ch,i)=>{const b=document.createElement("button");b.className="choice"+(S.chal===i?" sel":"");b.innerHTML=`<b>${ch.n}</b><br><small>${ch.d}</small>`;
+  b.onclick=()=>{S.chal=i;save();renderChal();};c.appendChild(b);});
+ if(S.chal===null||S.chal===undefined)return;
+ const ch=CH[S.chal];$("chalBox").style.display="block";
+ $("chalForm").innerHTML=`<h3 style="margin-top:0">${ch.n}</h3><label class="f">Start <small>(z. B. „ab Montag, 16.11.“)</small></label><input type="text" data-k="start">`+ch.f+`<label class="f">Wer unterstützt mich? <small>(Zusammen ist es leichter!)</small></label><input type="text" data-k="buddy">`;
+ $("chalForm").querySelectorAll("[data-k]").forEach(el=>{const k=S.chal+"_"+el.dataset.k;if(S.chalData[k])el.value=S.chalData[k];el.oninput=()=>{S.chalData[k]=el.value;save();};});
+ const t=$("tracker");
+ t.innerHTML=`<p style="margin:0 0 6px">Mein Monitoring – Klick wechselt: <span class="amp" style="background:#ddd"></span> offen · <span class="amp" style="background:#3a9c7d"></span> geschafft · <span class="amp" style="background:#e0b43a"></span> teilweise · <span class="amp" style="background:#c2493d"></span> nicht geschafft</p><table class="track"><tr><th></th><th>Woche 1</th><th>Woche 2</th><th>Woche 3</th><th>Woche 4</th></tr>${ch.rows.map(r=>`<tr><td>${r}</td>${[0,1,2,3].map(w=>{const k=S.chal+"|"+r+"|"+w;return `<td><span class="amp" style="background:${AMP[S.track[k]||0]};width:24px;height:24px;cursor:pointer" data-k="${encodeURIComponent(k)}"></span></td>`;}).join("")}</tr>`).join("")}</table>`;
+ t.querySelectorAll(".amp[data-k]").forEach(a=>a.onclick=()=>{const k=decodeURIComponent(a.dataset.k);S.track[k]=((S.track[k]||0)+1)%4;save();renderChal();});
+}
+renderChal();
+function makeLetter(){const v=["b1","b2","b3","b4"].map(id=>$(id).value.trim());
+ if(!v.some(Boolean)){alert("Schreib zuerst etwas in die Felder.");return;}
+ const d=new Date().toLocaleDateString("de-DE");const L=$("letter");L.style.display="block";
+ L.textContent=`Liebes zukünftiges Ich,\n\nheute, am ${d}, habe ich mich im Unterricht mit meinem Konsum beschäftigt.\n\n${v[0]?"Überrascht hat mich: "+v[0]+"\n\n":""}${v[1]?"Über meine Dinge habe ich gelernt: "+v[1]+"\n\n":""}${v[2]?"Ich nehme mir vor: "+v[2]+"\n\n":""}${v[3]?"Mit anderen will ich darüber so sprechen: "+v[3]+"\n\n":""}${S.chal!==null&&S.chal!==undefined?"Meine Challenge: "+CH[S.chal].n.replace(/^[^\wÄÖÜ]+/,"")+"\n\n":""}Schau mal, was daraus geworden ist!\n\nDein Ich von heute`;}
+
+/* Quiz */
+const QZ=[
+ {q:"Wie viele der ca. 5 Mrd. Kleidungsstücke in deutschen Schränken werden nie getragen?",o:["etwa 100 Millionen","etwa 1 Milliarde","etwa 4 Milliarden"],a:1},
+ {q:"Was meint „symbolischer Konsum“?",o:["Dinge werden wegen der Wirkung gekauft, die Werbung und Gesellschaft ihnen zuschreiben (z. B. Status, Selbstwert)","Man kauft nur kleine, günstige Dinge","Man bezahlt mit Symbolen statt Geld"],a:0},
+ {q:"Was ist Suffizienz?",o:["Gleicher Nutzen mit weniger Energie","Weniger Ressourcenverbrauch durch geringere Nachfrage nach Konsumgütern – „Genug ist genug“","Recycling von Plastik"],a:1},
+ {q:"Erich Fromm stellt die Existenzweise des Habens gegenüber der des …",o:["Kaufens","Sparens","Seins"],a:2},
+ {q:"„Ich habe ausgemistet, jetzt darf ich mir was Neues gönnen.“ Wie heißt dieser Effekt?",o:["Moralische Lizenzierung","Ankereffekt","Rebound-Effekt"],a:0},
+ {q:"Was ist ein Rebound-Effekt im Zusammenhang mit Konsumreduktion?",o:["Gespartes Geld fließt in umweltschädliche Aktivitäten, z. B. Flugreisen","Gekaufte Dinge werden zurückgeschickt","Preise steigen durch weniger Nachfrage"],a:0},
+ {q:"Warum fällt es schwer, sich von Dingen zu trennen, die man besitzt?",o:["Wegen des Endowment-Effekts: Eigener Besitz wird höher bewertet","Weil Wegwerfen verboten ist","Weil Dinge mit der Zeit immer wertvoller werden"],a:0},
+ {q:"Was unterscheidet Upcycling von Recycling?",o:["Beim Upcycling wird das Material eingeschmolzen","Beim Upcycling behält das Material seine Form und bekommt eine neue Funktion","Es gibt keinen Unterschied"],a:1},
+ {q:"Wie lange dauert es laut Forschung durchschnittlich, bis ein neues Verhalten zur festen Gewohnheit wird?",o:["7 Tage","21 Tage","rund 66 Tage"],a:2},
+ {q:"Welcher Tipp hilft am ehesten gegen Impulskäufe?",o:["Push-Nachrichten von Shopping-Apps einschalten","Wunschliste anlegen und ein bis zwei Wochen abwarten","Nur mit Kreditkarte bezahlen"],a:1}
+];
+(function(){const c=$("quiz");
+ QZ.forEach((x,i)=>{const d=document.createElement("div");d.className="card";d.dataset.i=i;
+  d.innerHTML=`<b>${i+1}. ${x.q}</b>`+x.o.map((t,k)=>`<button class="choice" data-k="${k}">${t}</button>`).join("");
+  d.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{if(d.dataset.locked)return;d.querySelectorAll(".choice").forEach(y=>y.classList.remove("sel"));b.classList.add("sel");});
+  c.appendChild(d);});})();
+function evalQuiz(){let r=0,miss=0;
+ document.querySelectorAll("#quiz .card").forEach(d=>{const x=QZ[d.dataset.i],s=d.querySelector(".choice.sel");if(!s){miss++;return;}
+  d.dataset.locked=1;d.querySelectorAll(".choice")[x.a].classList.add("right");if(+s.dataset.k===x.a)r++;else s.classList.add("wrong");});
+ if(miss){alert("Bitte beantworte alle Fragen ("+miss+" offen).");return;}
+ $("quizRes").style.display="block";
+ $("quizRes").innerHTML=`<div class="result-ring">${r} / ${QZ.length}</div><p>${r>=9?"🏆 Hervorragend – du hast den Kompass im Griff!":r>=6?"👍 Gut gemacht! Schau dir die rot markierten Fragen noch einmal an.":"📚 Geh die Stationen noch einmal durch und versuch es erneut (Seite neu laden)."}</p>`;
+ markDone(9);}
+
+/* Start */
+updProg();go(0);
+</script>
+</body>
+</html>
